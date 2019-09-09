@@ -12,7 +12,7 @@ function min5(X; prec = 1.e-3, passe = 0.1)
         end
 
         if sqrt(sum(@. grad^2)) < prec                # Computing the derivative
-            println(" Function is increasing. ")
+            println(" Critical point achieved. ")
             # println(" Best solution found: x = ", round(xbest, digits = 5), "y = ", round(ybest, digits = 5), " f(x) = ",round(fbest, digits = 5))
             return Xbest, fbest
         end
