@@ -15,7 +15,7 @@ function min2(x0; deltax = 0.01)
         # If the function decreased, save best point
         if deltaf < 0.
             xbest = x
-            fbest = x^2
+            fbest = x^2 + sin(10*x)
         else
             println(" Function is increasing. ")
             println(" Best solution found: x = ", round(xbest, digits = 20), " f(x) = ",round(fbest, digits = 20))
