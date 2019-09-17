@@ -25,7 +25,7 @@ function simplex(f,x0,niter)
     y = 0.
     println(" Initial points: ")
     for i in 1:3
-        println(" (x, y, f)", C[i])
+        println(" (x, y, f)  ", C[i])
     end
     # Convergence criterium desired
     convcrit = 1.e-10
@@ -37,7 +37,7 @@ function simplex(f,x0,niter)
         # Check convergence
         if (C[3].f - C[2].f < convcrit) && (C[3].f - C[1].f < convcrit)
             println(" Precision reached. ")
-            println(" Best point found: ", " (x, y, f)", C[3])
+            println(" Best point found: ", " (x, y, f)  ", C[3])
             return C[1].x, C[1].y, C[1].f
         end
         # Compute averge of best points
@@ -49,7 +49,7 @@ function simplex(f,x0,niter)
         # If ftrial is better than fx[3], replace point 3 with trial point
         if ptrial.f < C[3].f
             C[3] = ptrial
-            println(" Accepted point: ", " (x, y, f)", C[3])
+            println(" Accepted point: ", " (x, y, f)  ", C[3])
         else
             println(" Function increased. Trying line search. ")
             # Try up to 10 different points in the
@@ -61,19 +61,19 @@ function simplex(f,x0,niter)
                 if ptemp.f < C[3].f
                     C[3] = ptemp
                     println("   Line search succeeded at trial ", j)
-                    println("   New point: ", " (x, y, f)", C[3])
+                    println("   New point: ", " (x, y, f)  ", C[3])
                     break # exits from line search loop
                 end
             end
             # If the line search didn't find a better point, stop
             if ptemp.f > C[3].f
                 println(" End of search. ")
-                println(" Best point found: ", " (x, y, f)", C[1])
+                println(" Best point found: ", " (x, y, f)  ", C[1])
                 return C[1].x, C[1].y, C[1].f
             end
         end
     end
     println(" Maximum number of trials reached. ")
-    println(" Best point found: ", " (x, y, f)", C[3])
+    println(" Best point found: ", " (x, y, f)  ", C[3])
     return C[1].x, C[1].y, C[1].f
 end
