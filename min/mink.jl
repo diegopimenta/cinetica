@@ -1,5 +1,12 @@
 using DelimitedFiles, Printf
 
+struct data
+    CA0::Float64
+    CB0::Float64
+    dt::Float64
+    ca
+end
+
 function f(Asim,Aexp)
     f = 0.e0
     for i in 1:length(Aexp)
@@ -8,7 +15,7 @@ function f(Asim,Aexp)
     return f
 end
 
-function sim2( CA0, CB0, k1, km1, time; dt = 1.e-1)
+function sim2( CA0, CB0, k1, km1; time = 100, dt = 1.e-1)
     nsteps = Int64(round(time/dt)) # Number of steps
     t = Vector{Float64}(undef,nsteps)
     CA = Vector{Float64}(undef,nsteps)
@@ -25,20 +32,16 @@ function sim2( CA0, CB0, k1, km1, time; dt = 1.e-1)
     return t, CA, CB
 end
 
-function compare(K)
-    CA0 = 10.   # Initial concentration
-    CB0 = 1.
-    time = 100. # Simulation time
-    dt = 1.e-2
+function compute(K; expdata = expdata)
     k1 = K[1]
     km1 = K[2]
-    t, ca, cb = sim2(CA0, CB0, k1, km1, time, dt = dt)
-    return f(ca,caexp)
+    t, ca, cb = sim2(expdata.CA0, expdata.CB0, k1, km1, dt = expdata.dt)
+    return f(ca, expdata.ca)
 end
 
-data = readdlm("sim2/sim2.dat")
-caexp = data[:,2]
-popfirst!(caexp)
+file = readdlm("sim2/sim2.dat")
+expdata = data(10., 1., 1.e-2, file[:,2])
+popfirst!(expdata.ca)
 
 k0 = [Vector{Float64}(undef,2) for i in 1:3]
 for i in 1:3
@@ -46,6 +49,7 @@ for i in 1:3
   k0[i][2] = rand()
 end
 
-include("min/simplex.jl")
+include("simplex.jl")
 niter = 1000
-simplex(compare,k0,niter)
+optvar, optf = simplex(compute,k0,niter)
+println("\n\n", "---------> Best point found: ", " K = ", optvar, " || f = ", optf)
