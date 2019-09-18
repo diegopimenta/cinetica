@@ -55,7 +55,7 @@ function simplex(f,x0,niter)
             # Try up to 10 different points in the
             # direction x[3]+gamma*(xtrial-x[3])
             ctemp = similar(C[1].cord)
-            for j in 1:20
+            for j in 1:50
                 for k in 1:length(C[1].cord)
                     ctemp[k] = C[3].cord[k] + rand()*(ptrial.cord[k] - C[3].cord[k])
                 end

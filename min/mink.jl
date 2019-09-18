@@ -39,7 +39,7 @@ function compute(K; expdata = expdata)
     return f(ca, expdata.ca)
 end
 
-file = readdlm("sim2/sim2.dat")
+file = readdlm("sim2/sim2try.dat")
 expdata = data(10., 1., 1.e-2, file[:,2])
 popfirst!(expdata.ca)
 
@@ -50,6 +50,6 @@ for i in 1:3
 end
 
 include("simplex.jl")
-niter = 1000
+niter = 10000
 optvar, optf = simplex(compute,k0,niter)
 println("\n\n", "---------> Best point found: ", " K = ", optvar, " || f = ", optf)
