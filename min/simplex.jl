@@ -2,13 +2,8 @@
 # Simplex minimization enhanced
 #
 struct pmin
-    x
-    y
+    cord
     f
-end
-struct point
-    x
-    y
 end
 
 function simplex(f,x0,niter)
@@ -16,16 +11,16 @@ function simplex(f,x0,niter)
     C = Vector{pmin}(undef,length(x0))
     # Initial function values
     for i in 1:length(C)
-        C[i] = pmin(x0[i][1], x0[i][2], f(x0[i]))
+        C[i] = pmin(x0[i], f(x0[i]))
     end
-    xav = point(undef, undef)
-    ptrial = pmin(undef, undef, undef)
-    ptemp = pmin(undef, undef, undef)
+    xav = Vector{Float64}(undef, length(x0[1]))
+    ptrial = pmin(undef, undef)
+    ptemp = pmin(undef, undef)
     x = 0.
     y = 0.
     println(" Initial points: ")
     for i in 1:3
-        println(" (x, y, f)  ", C[i])
+        println(" ([cordinates], f)  ", C[i])
     end
     # Convergence criterium desired
     convcrit = 1.e-10
@@ -37,43 +32,50 @@ function simplex(f,x0,niter)
         # Check convergence
         if (C[3].f - C[2].f < convcrit) && (C[3].f - C[1].f < convcrit)
             println(" Precision reached. ")
-            println(" Best point found: ", " (x, y, f)  ", C[3])
-            return C[1].x, C[1].y, C[1].f
+            println(" Best point found: ", " ([cordinates], f)  ", C[1])
+            return C[1].cord, C[1].f
         end
         # Compute averge of best points
-        xav = point(0.5*(C[1].x + C[2].x), 0.5*(C[1].y + C[2].y))
+        cav = similar(C[1].cord)
+        for i in 1:length(C[1].cord)
+            cav[i] = 0.5*(C[1].cord[i]+C[2].cord[i])
+        end
         # Compute trial point
-        x = C[3].x + 2*(xav.x - C[3].x)
-        y = C[3].y + 2*(xav.y - C[3].y)
-        ptrial = pmin(x, y, f([x, y]))
+        ctrial = similar(cav)
+        for i in 1:length(cav)
+            ctrial[i] = C[3].cord[i] + 2*(cav[i] - C[3].cord[i])
+        end
+        ptrial = pmin(ctrial, f(ctrial))
         # If ftrial is better than fx[3], replace point 3 with trial point
         if ptrial.f < C[3].f
             C[3] = ptrial
-            println(" Accepted point: ", " (x, y, f)  ", C[3])
+            println(" Accepted point: ", " ([cordinates], f)  ", C[3])
         else
             println(" Function increased. Trying line search. ")
             # Try up to 10 different points in the
             # direction x[3]+gamma*(xtrial-x[3])
+            ctemp = similar(C[1].cord)
             for j in 1:20
-                x = C[3].x + rand()*(ptrial.x - C[3].x)
-                y = C[3].y + rand()*(ptrial.y - C[3].y)
-                ptemp = pmin(x, y, f([x, y]))
+                for k in 1:length(C[1].cord)
+                    ctemp[k] = C[3].cord[k] + rand()*(ptrial.cord[k] - C[3].cord[k])
+                end
+                ptemp = pmin(ctemp, f(ctemp))
                 if ptemp.f < C[3].f
                     C[3] = ptemp
                     println("   Line search succeeded at trial ", j)
-                    println("   New point: ", " (x, y, f)  ", C[3])
+                    println("   New point: ", " ([cordinates], f)  ", C[3])
                     break # exits from line search loop
                 end
             end
             # If the line search didn't find a better point, stop
             if ptemp.f > C[3].f
                 println(" End of search. ")
-                println(" Best point found: ", " (x, y, f)  ", C[1])
-                return C[1].x, C[1].y, C[1].f
+                println(" Best point found: ", " ([cordinates], f)  ", C[1])
+                return C[1].cord, C[1].f
             end
         end
     end
     println(" Maximum number of trials reached. ")
-    println(" Best point found: ", " (x, y, f)  ", C[3])
-    return C[1].x, C[1].y, C[1].f
+    println(" Best point found: ", " ([cordinates], f)  ", C[3])
+    return C[1].cord, C[1].f
 end
